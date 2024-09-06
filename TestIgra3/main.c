@@ -3,7 +3,7 @@
 
 void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle box_C);
 void BallMovement(struct Rectangle *boxC,int *ballSpeed_X, int *ballSpeed_Y);
-void aiPeddal();
+void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
 
 //void PlayAudio();
 
@@ -51,7 +51,7 @@ int main()
 			boxA.y = GetScreenHeight() - boxA.height;
 
 		BallMovement(&boxC, &ballSpeedX, &ballSpeedY);
-		aiPeddal();
+		aiPeddal(&boxB, &boxC, &brzinaKretanja);
 
 
 
@@ -66,10 +66,21 @@ int main()
 
 }
 
-void aiPeddal()
+void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed)
 {
 
-	printf("hello world");
+	if (boxC->y >= boxB->y + (boxB->height / 2))
+	{
+
+		boxB->y += *movementSpeed;
+
+	}
+	if (boxC->y <= boxB->y)
+	{
+
+		boxB->y -= *movementSpeed;
+
+	}
 
 }
 

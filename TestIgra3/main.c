@@ -45,10 +45,13 @@ int main()
 		}
 
 		if (boxA.y <= 0)
+		{
 			boxA.y = 0;
-
+		}
 		if (boxA.y + boxA.height >= GetScreenHeight())
+		{
 			boxA.y = GetScreenHeight() - boxA.height;
+		}
 
 		BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY);
 		aiPeddal(&boxB, &boxC, &brzinaKretanja);

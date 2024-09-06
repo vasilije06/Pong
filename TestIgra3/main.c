@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle box_C);
-void BallMovement(struct Rectangle *boxC,int *ballSpeed_X, int *ballSpeed_Y);
+void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y);
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
 
 //void PlayAudio();
@@ -50,7 +50,7 @@ int main()
 		if (boxA.y + boxA.height >= GetScreenHeight())
 			boxA.y = GetScreenHeight() - boxA.height;
 
-		BallMovement(&boxC, &ballSpeedX, &ballSpeedY);
+		BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY);
 		aiPeddal(&boxB, &boxC, &brzinaKretanja);
 
 
@@ -84,7 +84,7 @@ void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed
 
 }
 
-void BallMovement(struct Rectangle *boxC, int *ballSpeed_X, int *ballSpeed_Y)
+void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *ballSpeed_X, int *ballSpeed_Y)
 {
 
 	if (boxC->y <= 0 || boxC->y + boxC->height >= GetScreenHeight())
@@ -98,6 +98,16 @@ void BallMovement(struct Rectangle *boxC, int *ballSpeed_X, int *ballSpeed_Y)
 		printf("sudar\n");
 	}
 	
+	bool collisionAC = CheckCollisionRecs(*boxA, *boxC);
+	bool collisionBC = CheckCollisionRecs(*boxB, *boxC);
+
+	if (collisionAC == true || collisionBC == true)
+	{
+
+		*ballSpeed_X *= -1;
+		
+	}
+
 	boxC -> x += *ballSpeed_X;
 	boxC -> y += *ballSpeed_Y;
 

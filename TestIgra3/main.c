@@ -10,35 +10,42 @@ void playerMovement(struct Rectangle *boxA, int *playerSpeed);
 
 int main()
 {
-	const int screenW = 1200;
-	const int screenH = 1000;
+	const int screenH = 1000;//Širina ekrana u pikselima
+	const int screenW = 1200;//visina ekrana u pikselima
+	
+	//Promenljive za brzinu lopte za x i ipsilon osuu
 	int ballSpeedX = 5;
 	int ballSpeedY = 6;
 
-
-	int brzinaKretanja = 12;
+	//promenljiva za brzinu kretanja protivnièke pedale
 	int aiMovementSpeed = 5;
 
+	//promenljuiva brzine kretanja igraèa
+	int brzinaKretanja = 12;
+
+	//inicijalizacija prozora
 	InitWindow(screenW, screenH, "test igra");
 
+	//ciljani fps
 	SetTargetFPS(60);
 
+	//Inicijalizacija struktura za lopte i pedale
 	Rectangle boxA = { 40.0f , GetScreenWidth() / 2 - 200 , 20, 120};
 	Rectangle boxB = { screenW - 60, GetScreenWidth() / 2.0f - 200 , 20, 120};
 	Rectangle boxC = { screenW / 2 , screenH / 2 - 40, 20, 20};
 
 
-
+	//glavni loop igre
 	while (!WindowShouldClose())
 	{	
 
 		
-
+		//pozivanje funkcioja
+		playerMovement(&boxA, &brzinaKretanja);
 		BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY);
 		aiPeddal(&boxB, &boxC, &aiMovementSpeed);
 
 
-		playerMovement(&boxA, &brzinaKretanja);
 		printf("X:%.lf Y:%.lf\n", boxB.x, boxB.y);
 		ScreenDraw(boxA, boxB, boxC);
 		
@@ -50,9 +57,10 @@ int main()
 
 }
 
+//funkcija za kretanje igraèa-----------------------------------------------------------
 void playerMovement(struct Rectangle *boxA, int *playerSpeed)
 {
-
+	//Preveravanje da li igraè stste dugmiæe na tastaturi-------------------------------
 	if (IsKeyDown(KEY_UP))
 	{
 
@@ -65,7 +73,9 @@ void playerMovement(struct Rectangle *boxA, int *playerSpeed)
 		boxA->y += *playerSpeed;
 
 	}
+	//----------------------------------------------------------------------------------
 
+	//Provere da li igraè izašao iz polja ekrana----------------------------------------
 	if (boxA->y <= 0)
 	{
 		boxA->y = 0;
@@ -74,11 +84,14 @@ void playerMovement(struct Rectangle *boxA, int *playerSpeed)
 	{
 		boxA->y = GetScreenHeight() - boxA->height;
 	}
-
+	//-----------------------------------------------------------------------------------
 }
+//--------------------------------------------------------------------------------------
 
+//funkcija za kretanje protivnièke pedale----------------------------------------------------------
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed)
 {
+	//Provere da li igraè izašao iz polja ekrana----------------------------------------
 	if (boxB->y <= 0)
 	{
 		boxB->y = 0;
@@ -87,7 +100,9 @@ void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed
 	{
 		boxB->y = GetScreenHeight() - boxB->height;
 	}
+	//-----------------------------------------------------------------------------------
 
+	//pomeranje protivnika u zavisnosi od pozicije lopte---------------------------------
 	if (boxC->y >= boxB->y + (boxB->height / 2))
 	{
 
@@ -100,49 +115,60 @@ void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed
 		boxB->y -= *movementSpeed;
 
 	}
-
+	//------------------------------------------------------------------------------------
 }
+//-------------------------------------------------------------------------------------------------
 
+//funkcija za kretanje lopte----------------------------------------------------------------------------------------------------------
 void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *ballSpeed_X, int *ballSpeed_Y)
 {
-
+	//Provere ako lopta doðe do gornje ili donje ivice do se invertuje ballSpeedY-------------------------------------------------
 	if (boxC->y <= 0 || boxC->y + boxC->height >= GetScreenHeight())
 	{
 		*ballSpeed_Y *= -1;
 		printf("sudar\n");
 	}
+	//----------------------------------------------------------------------------------------------------------------------------
 	if (boxC->x <= 0 || boxC->x + boxC->width >= GetScreenWidth())
 	{
 		*ballSpeed_X *= -1;
 		printf("sudar\n");
 	}
 	
+	//boolijani koju se koriste da bi se proverilo da lilopta je došle u kontakt sa pedalama---------------------------------------
 	bool collisionAC = CheckCollisionRecs(*boxA, *boxC);
 	bool collisionBC = CheckCollisionRecs(*boxB, *boxC);
+	//-----------------------------------------------------------------------------------------------------------------------------
 
+	//Provera da li je lopta došla u kontakt sapedalama----------------------------------------------------------------------------
 	if (collisionAC == true || collisionBC == true)
 	{
 
 		*ballSpeed_X *= -1;
 		
 	}
+	//-----------------------------------------------------------------------------------------------------------------------------
 
+	//Promena pozicije lopte-------------------------------------------------------------------------------------------------------
 	boxC -> x += *ballSpeed_X;
 	boxC -> y += *ballSpeed_Y;
-
+	//------------------------------------------------------------------------------------------------------------------------------
 	
 
 }
+//------------------------------------------------------------------------------------------------------------------------------------
 
+//funkcija za crtanje ekrana----------------------------------------------------------------------------------------------------------
 void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle box_C)
-{
+{	
+	//funkcija za èišæenje pozadine----------------------------------------------------------------------------------------------------
 	ClearBackground(BLACK);
-
+	//---------------------------------------------------------------------------------------------------------------------------------
 	BeginDrawing();
 
-	DrawRectangleRec(box_A, WHITE);
-	DrawRectangleRec(box_B, WHITE);
-	DrawRectangleRec(box_C, WHITE);
+		DrawRectangleRec(box_A, WHITE);
+		DrawRectangleRec(box_B, WHITE);
+		DrawRectangleRec(box_C, WHITE);
 
 
 	EndDrawing();

@@ -4,7 +4,7 @@
 void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle box_C);
 void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y);
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
-
+void playerMovement(struct Rectangle *boxA, int *playerSpeed);
 //void PlayAudio();
 
 
@@ -17,6 +17,7 @@ int main()
 
 
 	int brzinaKretanja = 12;
+	int aiMovementSpeed = 5;
 
 	InitWindow(screenW, screenH, "test igra");
 
@@ -31,34 +32,14 @@ int main()
 	while (!WindowShouldClose())
 	{	
 
-		if (IsKeyDown(KEY_UP))
-		{
-
-			boxA.y = boxA.y - brzinaKretanja;
-
-		}
-		if (IsKeyDown(KEY_DOWN))
-		{
-
-			boxA.y = boxA.y + brzinaKretanja;
-
-		}
-
-		if (boxA.y <= 0)
-		{
-			boxA.y = 0;
-		}
-		if (boxA.y + boxA.height >= GetScreenHeight())
-		{
-			boxA.y = GetScreenHeight() - boxA.height;
-		}
+		
 
 		BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY);
-		aiPeddal(&boxB, &boxC, &brzinaKretanja);
+		aiPeddal(&boxB, &boxC, &aiMovementSpeed);
 
 
-
-		printf("X:%.lf Y:%.lf\n", boxC.x, boxC.y);
+		playerMovement(&boxA, &brzinaKretanja);
+		printf("X:%.lf Y:%.lf\n", boxB.x, boxB.y);
 		ScreenDraw(boxA, boxB, boxC);
 		
 	}
@@ -69,8 +50,43 @@ int main()
 
 }
 
+void playerMovement(struct Rectangle *boxA, int *playerSpeed)
+{
+
+	if (IsKeyDown(KEY_UP))
+	{
+
+		boxA->y -= *playerSpeed;
+
+	}
+	if (IsKeyDown(KEY_DOWN))
+	{
+
+		boxA->y += *playerSpeed;
+
+	}
+
+	if (boxA->y <= 0)
+	{
+		boxA->y = 0;
+	}
+	if (boxA->y + boxA->height >= GetScreenHeight())
+	{
+		boxA->y = GetScreenHeight() - boxA->height;
+	}
+
+}
+
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed)
 {
+	if (boxB->y <= 0)
+	{
+		boxB->y = 0;
+	}
+	if (boxB->y + boxB->height >= GetScreenHeight())
+	{
+		boxB->y = GetScreenHeight() - boxB->height;
+	}
 
 	if (boxC->y >= boxB->y + (boxB->height / 2))
 	{

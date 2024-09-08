@@ -5,8 +5,8 @@ void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle
 void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y, Sound *sound, Sound *sound1);
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
 void playerMovement(struct Rectangle *boxA, int *playerSpeed);
-void gameScore(struct Rectangle* boxA, struct Rectangle* boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart);
-void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore);
+void gameScore(struct Rectangle* boxA, struct Rectangle* boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, int *ballSpeedX, int *ballSpeedY , bool *gameStart);
+void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore, int *ballSpeedX, int *ballSpeedY);
 
 
 
@@ -17,14 +17,14 @@ int main()
 	const int screenW = 1200;//širina ekrana u pikselima
 	
 	//Promenljive za brzinu lopte za x i ipsilon osuu
-	int ballSpeedX = 5;
-	int ballSpeedY = 6;
+	int ballSpeedX = 6;
+	int ballSpeedY = 5;
 
 	//promenljiva za brzinu kretanja protivnièke pedale
-	int aiMovementSpeed = 5;
+	int aiMovementSpeed = 6;
 
 	//promenljuiva brzine kretanja igraèa
-	int brzinaKretanja = 12;
+	int brzinaKretanja = 8;
 
 	//promenljive peona pedala
 	int playerScore = 0;
@@ -37,7 +37,7 @@ int main()
 	bool gameStart = false;
 	
 	//inicijalizacija prozora
-	InitWindow(screenW, screenH, "test igra");
+	InitWindow(screenW, screenH, "Pong");
 	
 	InitAudioDevice();
 	
@@ -62,14 +62,14 @@ int main()
 
 		
 		//pozivanje funkcioja
-		StartGame(&gameStart, &screenNumber, &playerScore, &enemyScore);
+		StartGame(&gameStart, &screenNumber, &playerScore, &enemyScore, &ballSpeedX, &ballSpeedY);
 		
-		if (gameStart == true || screenNumber != 0)
+		if (gameStart == true)
 		{
 		
-			gameScore(&boxA, &boxB, &boxC, &playerScore, &enemyScore, &screenNumber, &gameStart);
-			playerMovement(&boxA, &brzinaKretanja);
+			gameScore(&boxA, &boxB, &boxC, &playerScore, &enemyScore, &screenNumber, &ballSpeedX, &ballSpeedY, &gameStart);
 			BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY, &sfxPedala, &sfxZid);
+			playerMovement(&boxA, &brzinaKretanja);
 			aiPeddal(&boxB, &boxC, &aiMovementSpeed);
 
 		
@@ -79,7 +79,7 @@ int main()
 			PlaySound(sound);
 			printf("test zvuka");
 		}*/
-		printf("screen Number: %d\n", screenNumber);
+		//printf("screen Number: %d\n", screenNumber);
 		ScreenDraw(boxA, boxB, boxC, playerScore, enemyScore, screenNumber);
 		
 	}
@@ -92,15 +92,18 @@ int main()
 }
 
 //funkcija koja se koristi sa bodove igre i odreðivanje broja ekrana
-void gameScore(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart)
+void gameScore(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, int *ballSpeedX, int *ballSpeedY, bool *gameStart)
 {
 	bool ballReset = false;
+	bool playerPoint = false;
+	bool enemyPoint = false;
 
 	if (boxC->x <= 0)
 	{
 
 		*enemyScore += 1;
 		ballReset = true;
+		playerPoint = true;
 
 
 	}
@@ -109,6 +112,7 @@ void gameScore(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle 
 
 		*playerScore += 1;
 		ballReset = true;
+		enemyPoint = true;
 
 	}
 
@@ -122,17 +126,35 @@ void gameScore(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle 
 	}
 
 	if (*playerScore >= 9)
+	{
 		*screenNum = 2;
-
+		*gameStart = false;
+	}
 	if (*enemyScore >= 9)
+	{
 		*screenNum = 3;
-
+		*gameStart = false;
+	}
 	if (ballReset == true)
 	{
 		boxC->x = GetScreenWidth() / 2;
 		boxC->y = GetScreenWidth() / 2 - 200;
+		if (playerPoint = true)
+		{
+			*ballSpeedX = 5;
+			*ballSpeedY = 5;
+			playerPoint = false;
+		}
+		if (enemyPoint = true)
+		{
+
+			*ballSpeedX = -5;
+			*ballSpeedY = 5;
+			enemyPoint = false;
+
+		}
 		ballReset = false;
-		printf("ballReset\n");
+		//printf("ballReset\n");
 	}
 
 
@@ -173,7 +195,7 @@ void playerMovement(struct Rectangle *boxA, int *playerSpeed)
 //funkcija za kretanje protivnièke pedale----------------------------------------------------------
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed)
 {
-	//Provere da li igraè izašao iz polja ekrana----------------------------------------
+	//Provere da li protivnik izašao iz polja ekrana----------------------------------------
 	if (boxB->y <= 0)
 	{
 		boxB->y = 0;
@@ -191,7 +213,7 @@ void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed
 		boxB->y += *movementSpeed;
 
 	}
-	if (boxC->y <= boxB->y)
+	if (boxC->y <= boxB->y + (boxB->height / 2))
 	{
 
 		boxB->y -= *movementSpeed;
@@ -210,14 +232,14 @@ void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectang
 		*ballSpeed_Y *= -1;
 		PlaySound(*sound);
 
-		printf("sudar\n");
+		//printf("sudar\n");
 	}
 	//----------------------------------------------------------------------------------------------------------------------------
 	if (boxC->x <= 0 || boxC->x + boxC->width >= GetScreenWidth())
 	{
 		*ballSpeed_X *= -1;
 		PlaySound(*sound);
-		printf("sudar\n");
+		//printf("sudar\n");
 	}
 	
 	//boolijani koju se koriste da bi se proverilo da lilopta je došle u kontakt sa pedalama---------------------------------------
@@ -228,8 +250,30 @@ void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectang
 	//Provera da li je lopta došla u kontakt sa pedalama----------------------------------------------------------------------------
 	if (collisionAC == true || collisionBC == true)
 	{
+		if (collisionAC)
+		{
+			boxC->x = boxA->x + boxA->width;  
+		}
+		else if (collisionBC)
+		{
+			boxC->x = boxB->x - boxC->width;  // Assuming paddleB is on the right side
+		}
 
-		*ballSpeed_X *= -1;
+		*ballSpeed_X = -(*ballSpeed_X + GetRandomValue(-10, 12));
+
+		if (abs(*ballSpeed_X) < 5)
+		{
+			*ballSpeed_X = (*ballSpeed_X < 0) ? -10 : 10;  // Set a minimum speed in the correct direction
+		}
+
+		
+		*ballSpeed_Y = (*ballSpeed_Y + GetRandomValue(1, 2));
+
+		if (abs(*ballSpeed_Y) < 3)
+		{
+			*ballSpeed_Y = (*ballSpeed_Y < 0) ? -4 : 4;  // Set a minimum speed in the correct direction
+		}
+
 		PlaySound(*sound1);
 		
 	}
@@ -264,6 +308,8 @@ void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle
 			DrawRectangleRec(box_C, WHITE);
 			DrawText(TextFormat("%d", playerScore), 120, 100, 40, WHITE);
 			DrawText(TextFormat("%d", enemyScore), 1080, 100, 40, WHITE);
+			DrawLine(GetScreenWidth() / 2, 0, GetScreenWidth() / 2, GetScreenHeight(), WHITE);
+			DrawCircleLines(GetScreenWidth() / 2, GetScreenHeight() / 2, 250, WHITE);
 			break;
 
 			case 2:
@@ -283,14 +329,14 @@ void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle
 
 }
 
-void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore)
+void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore, int *ballSpeedX, int *ballSpeedY)
 {
 
 	if (IsKeyPressed(KEY_SPACE))
 	{
 
 		*startGame = true;
-		printf("radi");
+		//printf("radi");
 
 	}
 	if (IsKeyPressed(KEY_R) && *screenNum != 1)
@@ -299,6 +345,8 @@ void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore
 		*screenNum = 0;
 		*playerScore = 0;
 		*enemyScore = 0;
+		*ballSpeedX = 5;
+		*ballSpeedY = 5;
 		
 
 	}

@@ -2,14 +2,13 @@
 #include <stdio.h>
 
 void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle box_C, int playerSxore, int enemyScore, int screenNum);
-void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y);
+void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y, Sound *sound, Sound *sound1);
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
 void playerMovement(struct Rectangle *boxA, int *playerSpeed);
 void gameScore(struct Rectangle* boxA, struct Rectangle* boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart);
 void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore);
 
 
-//void PlayAudio();
 
 
 int main()
@@ -36,10 +35,18 @@ int main()
 
 	//bulijan koji proverava da li je igra poèela
 	bool gameStart = false;
-
+	
 	//inicijalizacija prozora
 	InitWindow(screenW, screenH, "test igra");
+	
+	InitAudioDevice();
+	
+	Sound sfxZid;
+	Sound sfxPedala;
 
+	sfxZid = LoadSound("sfxZid.wav");
+	sfxPedala = LoadSound("sfxPedala.wav");
+	
 	//ciljani fps
 	SetTargetFPS(60);
 
@@ -62,18 +69,22 @@ int main()
 		
 			gameScore(&boxA, &boxB, &boxC, &playerScore, &enemyScore, &screenNumber, &gameStart);
 			playerMovement(&boxA, &brzinaKretanja);
-			BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY);
+			BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY, &sfxPedala, &sfxZid);
 			aiPeddal(&boxB, &boxC, &aiMovementSpeed);
 
 		
 		}
-		if (gameStart == false)
-			printf("gamestart == false");
+		/*if (IsKeyPressed(KEY_A))
+		{
+			PlaySound(sound);
+			printf("test zvuka");
+		}*/
 		printf("screen Number: %d\n", screenNumber);
 		ScreenDraw(boxA, boxB, boxC, playerScore, enemyScore, screenNumber);
 		
 	}
 
+	CloseAudioDevice();
 	CloseWindow();
 
 	return 0;
@@ -191,18 +202,21 @@ void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC, int *movementSpeed
 //-------------------------------------------------------------------------------------------------
 
 //funkcija za kretanje lopte----------------------------------------------------------------------------------------------------------
-void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *ballSpeed_X, int *ballSpeed_Y)
+void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *ballSpeed_X, int *ballSpeed_Y, Sound *sound, Sound *sound1)
 {
 	//Provere ako lopta doðe do gornje ili donje ivice do se invertuje ballSpeedY-------------------------------------------------
 	if (boxC->y <= 0 || boxC->y + boxC->height >= GetScreenHeight())
 	{
 		*ballSpeed_Y *= -1;
+		PlaySound(*sound);
+
 		printf("sudar\n");
 	}
 	//----------------------------------------------------------------------------------------------------------------------------
 	if (boxC->x <= 0 || boxC->x + boxC->width >= GetScreenWidth())
 	{
 		*ballSpeed_X *= -1;
+		PlaySound(*sound);
 		printf("sudar\n");
 	}
 	
@@ -211,11 +225,12 @@ void BallMovement(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectang
 	bool collisionBC = CheckCollisionRecs(*boxB, *boxC);
 	//-----------------------------------------------------------------------------------------------------------------------------
 
-	//Provera da li je lopta došla u kontakt sapedalama----------------------------------------------------------------------------
+	//Provera da li je lopta došla u kontakt sa pedalama----------------------------------------------------------------------------
 	if (collisionAC == true || collisionBC == true)
 	{
 
 		*ballSpeed_X *= -1;
+		PlaySound(*sound1);
 		
 	}
 	//-----------------------------------------------------------------------------------------------------------------------------

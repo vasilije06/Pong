@@ -346,7 +346,7 @@ void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore
 		*playerScore = 0;
 		*enemyScore = 0;
 		*ballSpeedX = 5;
-		*ballSpeedY = 5;
+		*ballSpeedY = 4;
 		
 
 	}

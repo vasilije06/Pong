@@ -5,8 +5,9 @@ void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle
 void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y);
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
 void playerMovement(struct Rectangle *boxA, int *playerSpeed);
-void gameScore(struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart);
+void gameScore(struct Rectangle* boxA, struct Rectangle* boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart);
 void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore);
+
 
 //void PlayAudio();
 
@@ -59,7 +60,7 @@ int main()
 		if (gameStart == true || screenNumber != 0)
 		{
 		
-			gameScore(&boxC, &playerScore, &enemyScore, &screenNumber, &gameStart);
+			gameScore(&boxA, &boxB, &boxC, &playerScore, &enemyScore, &screenNumber, &gameStart);
 			playerMovement(&boxA, &brzinaKretanja);
 			BallMovement(&boxA, &boxB, &boxC, &ballSpeedX, &ballSpeedY);
 			aiPeddal(&boxB, &boxC, &aiMovementSpeed);
@@ -79,20 +80,24 @@ int main()
 
 }
 
-//funkcija koja se koristi sa bodove igre in odreðivanje broja ekrana
-void gameScore(struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart)
+//funkcija koja se koristi sa bodove igre i odreðivanje broja ekrana
+void gameScore(struct Rectangle *boxA, struct Rectangle *boxB, struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart)
 {
+	bool ballReset = false;
 
 	if (boxC->x <= 0)
 	{
 
 		*enemyScore += 1;
+		ballReset = true;
+
 
 	}
 	if (boxC->x + boxC->width >= GetScreenWidth())
 	{
 
 		*playerScore += 1;
+		ballReset = true;
 
 	}
 
@@ -105,12 +110,19 @@ void gameScore(struct Rectangle *boxC, int *playerScore, int *enemyScore, int *s
 		//*gameStart = false;
 	}
 
-	if (*playerScore >= 2)
+	if (*playerScore >= 9)
 		*screenNum = 2;
 
-	if (*enemyScore >= 2)
+	if (*enemyScore >= 9)
 		*screenNum = 3;
 
+	if (ballReset == true)
+	{
+		boxC->x = GetScreenWidth() / 2;
+		boxC->y = GetScreenWidth() / 2 - 200;
+		ballReset = false;
+		printf("ballReset\n");
+	}
 
 
 
@@ -272,6 +284,7 @@ void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore
 		*screenNum = 0;
 		*playerScore = 0;
 		*enemyScore = 0;
+		
 
 	}
 

@@ -6,7 +6,7 @@ void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangl
 void aiPeddal(struct Rectangle *boxB, struct Rectangle *boxC,int *movementSpeed);
 void playerMovement(struct Rectangle *boxA, int *playerSpeed);
 void gameScore(struct Rectangle *boxC, int *playerScore, int *enemyScore, int *screenNum, bool *gameStart);
-void StartGame(bool *startGame);
+void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore);
 
 //void PlayAudio();
 
@@ -54,7 +54,7 @@ int main()
 
 		
 		//pozivanje funkcioja
-		StartGame(&gameStart);
+		StartGame(&gameStart, &screenNumber, &playerScore, &enemyScore);
 		
 		if (gameStart == true || screenNumber != 0)
 		{
@@ -66,6 +66,8 @@ int main()
 
 		
 		}
+		if (gameStart == false)
+			printf("gamestart == false");
 		printf("screen Number: %d\n", screenNumber);
 		ScreenDraw(boxA, boxB, boxC, playerScore, enemyScore, screenNumber);
 		
@@ -254,7 +256,7 @@ void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle
 
 }
 
-void StartGame(bool *startGame)
+void StartGame(bool *startGame,int *screenNum, int *playerScore, int *enemyScore)
 {
 
 	if (IsKeyPressed(KEY_SPACE))
@@ -264,8 +266,13 @@ void StartGame(bool *startGame)
 		printf("radi");
 
 	}
-	if (IsKeyPressed(KEY_R))
+	if (IsKeyPressed(KEY_R) && *screenNum != 1)
+	{
 		*startGame = false;
-	
+		*screenNum = 0;
+		*playerScore = 0;
+		*enemyScore = 0;
+
+	}
 
 }

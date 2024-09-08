@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void ScreenDraw(struct Rectangle box_A, struct Rectangle box_B, struct Rectangle box_C, int playerSxore, int enemyScore, int screenNum);
 void BallMovement(struct Rectangle *boxA,struct Rectangle *boxB, struct Rectangle *boxC ,int *ballSpeed_X, int *ballSpeed_Y, Sound *sound, Sound *sound1);
